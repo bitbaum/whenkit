@@ -70,6 +70,20 @@ uncontrolled (`defaultValue` + `name`, e.g. a server-action form). The empty
 state and weekday/month words follow `<html lang>` (or pass `locale` /
 `placeholder`).
 
+### Migrating a repo
+
+```bash
+# one re-export per app: components/ui/date-input.tsx
+#   "use client"; import "@bitbaum/whenkit/styles.css"; export { DateInput } from "@bitbaum/whenkit/react";
+node node_modules/@bitbaum/whenkit/scripts/migrate-date-inputs.mjs src --import "@/components/ui/date-input"          # dry run
+node node_modules/@bitbaum/whenkit/scripts/migrate-date-inputs.mjs src --import "@/components/ui/date-input" --write  # apply
+```
+
+It changes the tag and adds one import — nothing else — and lists what it will
+not guess (spread props, a dynamic `type={…}`). `--from Input` converts an
+app's own wrapper component instead of the raw `<input>`. Tested on tricky
+fixtures (`test/codemod.test.js`); a second run changes nothing.
+
 ## Rules it enforces
 
 - Dates are `YYYY-MM-DD`, times `HH:MM` — wall-clock strings. They become an
