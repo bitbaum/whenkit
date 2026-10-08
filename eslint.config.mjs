@@ -20,7 +20,7 @@ export default tseslint.config(
   },
   {
     // Tests are plain Node running under `node --test`.
-    files: ["test/**/*.js", "test/**/*.mjs"],
+    files: ["test/**/*.js", "test/**/*.mjs", "scripts/**/*.mjs"],
     // browser.mjs is Node driving a browser: page.evaluate bodies run there.
     languageOptions: { globals: { ...globals.node, ...globals.nodeBuiltin, ...globals.browser } },
   },
