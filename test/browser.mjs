@@ -97,9 +97,34 @@ try {
       `${name}: flexible request without a day`,
     );
 
+    // The app's own classes win over whenkit's defaults — plain CSS and a
+    // layered (Tailwind-style) utility alike. Without @layer base for the
+    // defaults, whenkit's unlayered rules would beat the layered utility.
+    const own = await page.evaluate(() => {
+      const css = (sel) => getComputedStyle(document.querySelector(sel));
+      return {
+        plainBorder: css("#own-class .wk-input").borderTopColor,
+        plainWidth: css("#own-class .wk-input").borderTopWidth,
+        utilWidth: css("#util-class .wk-input").borderTopWidth,
+        utilStyle: css("#util-class .wk-input").borderTopStyle,
+      };
+    });
+    check(
+      own.plainBorder === "rgb(255, 0, 0)" && own.plainWidth === "3px",
+      `${name}: an app class beats whenkit's input look (${own.plainBorder} ${own.plainWidth})`,
+    );
+    check(
+      own.utilWidth === "5px" && own.utilStyle === "dashed",
+      `${name}: a layered utility beats it too (${own.utilWidth} ${own.utilStyle})`,
+    );
+
     const small = await page.evaluate(
       () =>
-        [...document.querySelectorAll(".wk-chip, .wk-day, .wk-field-box")]
+        [
+          ...document.querySelectorAll(
+            ".wk-chip, .wk-day, .wk-field .wk-input, .wk-other .wk-input",
+          ),
+        ]
           .filter((el) => el.getClientRects().length > 0)
           .map((el) => el.getBoundingClientRect())
           .filter((r) => r.height < 43.5 || r.width < 43.5).length,
@@ -107,7 +132,7 @@ try {
     check(small === 0, `${name}: every chip, day and field is at least 44px (${small} too small)`);
 
     const inputSize = await page.evaluate(() =>
-      parseFloat(getComputedStyle(document.querySelector(".wk-field-input")).fontSize),
+      parseFloat(getComputedStyle(document.querySelector(".wk-input-native")).fontSize),
     );
     check(inputSize >= 16, `${name}: date input is ${inputSize}px (iOS zooms below 16)`);
 

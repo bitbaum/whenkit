@@ -47,6 +47,20 @@
         background: hsl(var(--surface-base, 0 0% 100%));
         box-sizing: border-box;
       }
+      /* An app's OWN input class, unlayered plain CSS and a layered utility: both
+         must beat whenkit's defaults (they live in @layer base). */
+      .app-input {
+        padding: 2px 6px;
+        border: 3px solid rgb(255, 0, 0);
+        border-radius: 0;
+      }
+      @layer utilities {
+        .util-input {
+          border-width: 5px;
+          border-style: dashed;
+          border-color: rgb(0, 0, 255);
+        }
+      }
       .resolved {
         font-size: 11px;
         opacity: 0.5;
@@ -70,6 +84,10 @@
           <h2>A plain date field</h2>
           <div id="field"></div>
         </section>
+      </div>
+      <div class="grid" style="margin-top: 24px">
+        <section><div id="own-class"></div></section>
+        <section><div id="util-class"></div></section>
       </div>
       <div class="dialog-like" id="dialog"></div>
     </main>

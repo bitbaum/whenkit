@@ -5,7 +5,7 @@ length chips, a readable date field over the native picker, and a booking
 request that resolves to `{ startsAt, endsAt }` in the provider's time zone.
 
 ```bash
-pnpm add github:bitbaum/whenkit#v0.2.1
+pnpm add github:bitbaum/whenkit#v0.3.0
 ```
 
 ```tsx
@@ -48,6 +48,28 @@ rented by the day. Three decisions replace that:
    autofill, a11y) transparent on top of a display that reads "Sat, 11 Oct ·
    14:00", and opens the picker on tap.
 
+## Replacing the date inputs you already have
+
+`DateInput` is a drop-in for `<input type="date">` / `type="datetime-local"`:
+same props, same `onChange(event)`, so a call site changes its tag and nothing
+else.
+
+```tsx
+import { DateInput } from "@bitbaum/whenkit/react";
+import "@bitbaum/whenkit/styles.css";
+
+// before: <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className="input" />
+<DateInput value={due} onChange={(e) => setDue(e.target.value)} className="input" />;
+```
+
+Your own `className` lands on the visible box, and it wins: whenkit's look sits
+in `@layer base`, below Tailwind utilities and plain app CSS. The real input
+stays on top, invisible, so the picker, keyboard entry, autofill, `required`
+validation and form submission all keep working. Controlled (`value`) or
+uncontrolled (`defaultValue` + `name`, e.g. a server-action form). The empty
+state and weekday/month words follow `<html lang>` (or pass `locale` /
+`placeholder`).
+
 ## Rules it enforces
 
 - Dates are `YYYY-MM-DD`, times `HH:MM` — wall-clock strings. They become an
@@ -71,7 +93,7 @@ rented by the day. Three decisions replace that:
 `type BookingChoice`.
 
 **React** (`@bitbaum/whenkit/react`): `BookingRequestPicker`, `DayStrip`,
-`ChipGroup`, `DateField`.
+`ChipGroup`, `DateInput`, `DateField` (a `DateInput` with its own label).
 
 **Look** (`@bitbaum/whenkit/styles.css`): `--wk-*` variables default to
 `@bitbaum/design-tokens`; set them once to match any other app.

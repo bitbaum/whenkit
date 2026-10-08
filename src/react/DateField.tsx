@@ -1,22 +1,15 @@
 "use client";
 
 /**
- * A date (or date + time) field that reads like a sentence and picks like the
- * phone does.
- *
- * The native picker is the best one there is on a phone — what looked bad
- * across the fleet was the raw field around it: the browser's locale
- * placeholder ("tt.mm.jjjj, --:--"), unstyled, different in every browser.
- * So the native input stays (keyboard entry, a11y, autofill all keep
- * working) and sits transparently over a display that says "Sat, 11 Oct ·
- * 14:00". A tap anywhere opens the platform picker via `showPicker()`.
+ * A labelled date (or date + time) field: `DateInput` with its own label and
+ * an optional hint, for places that do not already have a form-field wrapper.
+ * Apps that do (most) use `DateInput` directly.
  *
  * Values are `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM` wall-clock strings — exactly
  * what the native input speaks — never instants.
  */
 import { useId } from "react";
-import { dayLabel, formatTime } from "../labels.js";
-import { isISODate, isWallTime } from "../calendar.js";
+import { DateInput, describeValue } from "./DateInput.js";
 
 export interface DateFieldProps {
   label: string;
@@ -34,20 +27,8 @@ export interface DateFieldProps {
   className?: string;
 }
 
-export function describeFieldValue(value: string, withTime: boolean, locale = "en"): string {
-  const [date, time] = value.split("T");
-  if (!isISODate(date)) return "";
-  const day = dayLabel(date, { locale });
-  const dayText = new Intl.DateTimeFormat(locale, {
-    timeZone: "UTC",
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(`${date}T00:00:00Z`));
-  if (withTime && isWallTime(time)) return `${dayText} · ${formatTime(time, locale)}`;
-  return dayText || day.short;
-}
+/** Kept for callers of 0.1–0.2: the words for a value, or "" if invalid. */
+export const describeFieldValue = describeValue;
 
 export function DateField({
   label,
@@ -59,60 +40,29 @@ export function DateField({
   required,
   name,
   placeholder,
-  locale = "en",
+  locale,
   hint,
   className,
 }: DateFieldProps) {
   const id = useId();
-  const shown = value ? describeFieldValue(value, withTime, locale) : "";
   return (
     <div className={["wk-field", className].filter(Boolean).join(" ")}>
       <label className="wk-label" htmlFor={id}>
         {label}
       </label>
-      <div className="wk-field-box" data-empty={shown ? undefined : true}>
-        <span className="wk-field-text" aria-hidden="true">
-          {shown || placeholder || (withTime ? "Pick a day and time" : "Pick a day")}
-        </span>
-        <svg className="wk-field-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <rect
-            x="3.5"
-            y="5"
-            width="17"
-            height="15"
-            rx="2.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-          />
-          <path
-            d="M3.5 9.5h17M8 3v4M16 3v4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-          />
-        </svg>
-        <input
-          id={id}
-          className="wk-field-input"
-          type={withTime ? "datetime-local" : "date"}
-          value={value}
-          min={min}
-          max={max}
-          required={required}
-          name={name}
-          aria-describedby={hint ? `${id}-hint` : undefined}
-          onChange={(e) => onChange(e.target.value)}
-          onClick={(e) => {
-            try {
-              e.currentTarget.showPicker?.();
-            } catch {
-              // Not allowed (e.g. cross-origin iframe): native focus still works.
-            }
-          }}
-        />
-      </div>
+      <DateInput
+        id={id}
+        type={withTime ? "datetime-local" : "date"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        min={min}
+        max={max}
+        required={required}
+        name={name}
+        placeholder={placeholder}
+        locale={locale}
+        aria-describedby={hint ? `${id}-hint` : undefined}
+      />
       {hint && (
         <p className="wk-hint" id={`${id}-hint`}>
           {hint}
