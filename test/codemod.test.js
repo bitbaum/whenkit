@@ -135,3 +135,28 @@ test("risky shapes are listed for a human, not guessed", () => {
   assert.match(out, /spreads props/);
   assert.match(out, /dynamic type=/);
 });
+
+test("comments that mention an input are not call sites, and the app's own whenkit re-export is skipped", () => {
+  const withComments = `import x from "x";
+// <input type="date"> used to be a bare field
+/* and <input type="datetime-local" /> here */
+export const A = () => (<>{/* <input type="date" /> */}<input type="date" /></>);
+`;
+  const shim = `"use client";\n// the real <input type="date"> stays on top\nimport "@bitbaum/whenkit/styles.css";\nexport { DateInput } from "@bitbaum/whenkit/react";\n`;
+  const dir = project({ "a.tsx": withComments, "shim.tsx": shim });
+  run(dir, ["--write"]);
+  const after = read(dir, "a.tsx");
+  assert.match(after, /\/\/ <input type="date"> used to be/);
+  assert.match(after, /\/\* and <input type="datetime-local" \/> here \*\//);
+  assert.match(after, /\{\/\* <input type="date" \/> \*\/\}<DateInput type="date" \/>/);
+  assert.equal((after.match(/<DateInput/g) ?? []).length, 1);
+  assert.equal(read(dir, "shim.tsx"), shim);
+});
+
+test("a URL in a string does not hide the rest of the line", () => {
+  const dir = project({
+    "a.tsx": `import x from "x";\nexport const A = () => <a href="http://x.y">go</a>;\nexport const B = () => <input type="date" />; // after\n`,
+  });
+  run(dir, ["--write"]);
+  assert.match(read(dir, "a.tsx"), /<DateInput type="date" \/>; \/\/ after/);
+});

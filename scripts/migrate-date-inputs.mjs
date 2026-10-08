@@ -84,19 +84,30 @@ const TYPE_STATIC =
   /\btype=(?:"(date|datetime-local)"|'(date|datetime-local)'|\{\s*["'](date|datetime-local)["']\s*\})/;
 const TYPE_ANY = /\btype=\{/;
 
+/** `src` with comments blanked (same length, so indexes still line up). */
+function maskComments(src) {
+  const blank = (m) => m.replace(/[^\n]/g, " ");
+  return src
+    .replace(/\/\*[\s\S]*?\*\//g, blank)
+    .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, (m, lead) => lead + blank(m.slice(lead.length)));
+}
+
 let changedFiles = 0;
 let changedTags = 0;
 const review = [];
 
 for (const file of walk(root)) {
-  let src = readFileSync(file, "utf8");
+  const src = readFileSync(file, "utf8");
+  // The app's own re-export (and anything already on whenkit) is not a call site.
+  if (src.includes("@bitbaum/whenkit")) continue;
+  const code = maskComments(src);
   const opening = new RegExp(`<${from}(?=[\\s/>])`, "g");
   let out = "";
   let last = 0;
   let count = 0;
   const alias = /\bDateInput\b/.test(src) && !src.includes(`from "${importFrom}"`);
   const tag = alias ? "WhenDateInput" : "DateInput";
-  for (const m of src.matchAll(opening)) {
+  for (const m of code.matchAll(opening)) {
     const end = tagEnd(src, m.index);
     if (end < 0) continue;
     const attrs = src.slice(m.index, end);
