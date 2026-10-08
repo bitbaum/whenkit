@@ -1,0 +1,82 @@
+{
+  "name": "@bitbaum/whenkit",
+  "version": "0.1.0",
+  "description": "Dates and times people can pick without typing: day chips, time chips, length chips, a readable date field over the native picker, and a low-friction booking request that resolves to {startsAt, endsAt} in the provider's zone.",
+  "license": "MIT",
+  "author": "Cato",
+  "homepage": "https://github.com/bitbaum/whenkit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitbaum/whenkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bitbaum/whenkit/issues"
+  },
+  "keywords": [
+    "date",
+    "time",
+    "picker",
+    "booking",
+    "react",
+    "calendar",
+    "bitbaum"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "files": [
+    "dist",
+    "styles.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.test.js",
+    "check:dist": "git diff --exit-code --stat -- dist",
+    "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run build && pnpm test && pnpm run test:browser",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "demo": "esbuild demo/demo.tsx --bundle --jsx=automatic --format=iife --define:process.env.NODE_ENV='\"production\"' --outfile=demo/dist/demo.js --log-level=warning",
+    "test:browser": "pnpm run demo && node test/browser.mjs"
+  },
+  "devDependencies": {
+    "@bitbaum/design-tokens": "^1.1.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.4.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.9.1",
+    "globals": "^17.11.0",
+    "playwright": "1.63.0",
+    "prettier": "^3.9.6",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.68.0"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}
