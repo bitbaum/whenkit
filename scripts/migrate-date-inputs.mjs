@@ -116,7 +116,9 @@ for (const file of walk(root)) {
       last = m.index + m[0].length;
       count++;
       const line = src.slice(0, m.index).split("\n").length;
-      if (/\{\s*\.\.\./.test(attrs))
+      // A JSX prop spread is `{...x}` at attribute level; `({ ...form, a })` inside
+      // an onChange arrow is an object literal and is not worth a human's time.
+      if (/(^|[\s"'}/])\{\s*\.\.\.[A-Za-z_$]/.test(attrs.replace(/=\{[^}]*\}/g, "=")))
         review.push(`${relative(root, file)}:${line} spreads props — check they are input props`);
     } else if (TYPE_ANY.test(attrs) && /date/i.test(src.slice(m.index, m.index + 400))) {
       const line = src.slice(0, m.index).split("\n").length;

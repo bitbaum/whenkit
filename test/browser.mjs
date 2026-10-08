@@ -128,6 +128,23 @@ try {
       `${name}: a 12px compact date input stays compact (${Math.round(compactHeight)}px)`,
     );
 
+    // The date box is the same height as a native input given the same class —
+    // so a form row does not step when one field is a date.
+    const heights = await page.evaluate(() => ({
+      native: document.getElementById("match-native").getBoundingClientRect().height,
+      date: document.querySelector("#match-date .wk-input").getBoundingClientRect().height,
+    }));
+    check(
+      Math.abs(heights.native - heights.date) <= 1,
+      `${name}: date box matches a native input's height (${heights.date} vs ${heights.native})`,
+    );
+    // An app class with display:block on the same element must not break the layout.
+    const stacked = await page.evaluate(() => {
+      const box = document.querySelector("#block-class .wk-input");
+      return getComputedStyle(box).display;
+    });
+    check(stacked === "flex", `${name}: an app's display:block cannot break the box (${stacked})`);
+
     const small = await page.evaluate(
       () =>
         [

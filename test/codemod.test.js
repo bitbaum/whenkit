@@ -160,3 +160,13 @@ test("a URL in a string does not hide the rest of the line", () => {
   run(dir, ["--write"]);
   assert.match(read(dir, "a.tsx"), /<DateInput type="date" \/>; \/\/ after/);
 });
+
+test("an object spread inside onChange is not flagged; a JSX prop spread still is", () => {
+  const dir = project({
+    "a.tsx": `import x from "x";\nexport const A = () => <input type="date" onChange={(e) => set({ ...form, date: e.target.value })} />;\n`,
+    "b.tsx": `import x from "x";\nexport const B = () => <input type="date" {...register("when")} />;\n`,
+  });
+  const out = run(dir);
+  assert.doesNotMatch(out, /a\.tsx:\d+ spreads props/);
+  assert.match(out, /b\.tsx:\d+ spreads props/);
+});
