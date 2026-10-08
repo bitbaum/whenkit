@@ -93,3 +93,18 @@ test("ChipGroup is a radiogroup with one tab stop", () => {
   assert.equal((html.match(/tabindex="0"/g) ?? []).length, 1);
   assert.match(html, /role="radio" aria-checked="true"/);
 });
+
+test("a fixed duration shows no length choice and is used for the slot", () => {
+  const html = renderToString(
+    h(BookingRequestPicker, {
+      ...base,
+      unit: "hour",
+      lengths: [90],
+      value: { kind: "slot", date: "2026-10-11", time: "14:00", lengthMinutes: 90 },
+    }),
+  );
+  assert.doesNotMatch(html, /aria-label="For how long"/);
+  assert.match(html, /14:00–15:30/);
+  // 17:00 + 90 min would end after 18:00 closing, so it is not offered.
+  assert.doesNotMatch(html, />17:00</);
+});

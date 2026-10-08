@@ -26,6 +26,12 @@ export interface BookingRequestPickerProps {
     hours?: DailyHours;
     /** Weekdays open, 0 = Sunday … 6 = Saturday. Omit for every day. */
     openWeekdays?: number[];
+    /**
+     * Lengths to offer, minutes. Defaults to what fits the opening hours. Pass
+     * one value for a fixed duration (a 60-minute session): the length row is
+     * not shown and that duration is used.
+     */
+    lengths?: number[];
     /** Spacing of start times, minutes. */
     stepMinutes?: number;
     /** Days shown as chips. */
@@ -35,5 +41,5 @@ export interface BookingRequestPickerProps {
     /** For tests and demos; defaults to now. */
     now?: Date;
 }
-export declare function BookingRequestPicker({ unit, zone, locale, value, onChange, hours, openWeekdays, stepMinutes, daysAhead, allowFlexible, words: wordOverrides, now, }: BookingRequestPickerProps): import("react").JSX.Element;
+export declare function BookingRequestPicker({ unit, zone, locale, value, onChange, hours, lengths: lengthsProp, openWeekdays, stepMinutes, daysAhead, allowFlexible, words: wordOverrides, now, }: BookingRequestPickerProps): import("react").JSX.Element;
 //# sourceMappingURL=BookingRequestPicker.d.ts.map

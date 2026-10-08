@@ -27,7 +27,7 @@ function emptyFor(unit) {
         ? { kind: "days", from: null, to: null }
         : { kind: "slot", date: null, time: null, lengthMinutes: null };
 }
-export function BookingRequestPicker({ unit, zone, locale = "en", value, onChange, hours = DEFAULT_HOURS, openWeekdays, stepMinutes = 60, daysAhead = 14, allowFlexible = true, words: wordOverrides, now, }) {
+export function BookingRequestPicker({ unit, zone, locale = "en", value, onChange, hours = DEFAULT_HOURS, lengths: lengthsProp, openWeekdays, stepMinutes = 60, daysAhead = 14, allowFlexible = true, words: wordOverrides, now, }) {
     const words = { ...DEFAULT_PICKER_WORDS, ...wordOverrides };
     const instant = now ?? new Date();
     const today = todayIn(zone, instant);
@@ -46,7 +46,9 @@ export function BookingRequestPicker({ unit, zone, locale = "en", value, onChang
         body = (_jsx(DayStrip, { label: words.days, today: today, days: daysAhead, locale: locale, mode: "range", from: choice.from, to: choice.to, isDisabled: closed, otherDateLabel: words.otherDate, onChange: ({ from, to }) => onChange({ kind: "days", from, to }) }));
     }
     else {
-        const lengths = lengthOptions(hours);
+        const lengths = lengthsProp && lengthsProp.filter((m) => m > 0).length > 0
+            ? lengthsProp.filter((m) => m > 0)
+            : lengthOptions(hours);
         const length = choice.lengthMinutes ?? lengths[0];
         const slots = choice.date
             ? timeSlots({
@@ -62,7 +64,7 @@ export function BookingRequestPicker({ unit, zone, locale = "en", value, onChang
                         time: null,
                         lengthMinutes: choice.lengthMinutes ?? length,
                     }) }), choice.date &&
-                    (slots.length > 0 ? (_jsx(ChipGroup, { label: words.time, value: choice.time, options: slots.map((t) => ({ value: t, label: formatTime(t, locale) })), onChange: (time) => onChange({ ...choice, time, lengthMinutes: length }) })) : (_jsx("p", { className: "wk-hint", role: "status", children: words.noTimes }))), choice.date && slots.length > 0 && (_jsx(ChipGroup, { label: words.length, value: length, options: lengths.map((m) => ({ value: m, label: formatLength(m, locale) })), onChange: (lengthMinutes) => {
+                    (slots.length > 0 ? (_jsx(ChipGroup, { label: words.time, value: choice.time, options: slots.map((t) => ({ value: t, label: formatTime(t, locale) })), onChange: (time) => onChange({ ...choice, time, lengthMinutes: length }) })) : (_jsx("p", { className: "wk-hint", role: "status", children: words.noTimes }))), choice.date && slots.length > 0 && lengths.length > 1 && (_jsx(ChipGroup, { label: words.length, value: length, options: lengths.map((m) => ({ value: m, label: formatLength(m, locale) })), onChange: (lengthMinutes) => {
                         // A longer booking may no longer fit after the chosen start.
                         const fits = timeSlots({
                             hours,

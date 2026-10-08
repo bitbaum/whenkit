@@ -63,6 +63,12 @@ export interface BookingRequestPickerProps {
   hours?: DailyHours;
   /** Weekdays open, 0 = Sunday … 6 = Saturday. Omit for every day. */
   openWeekdays?: number[];
+  /**
+   * Lengths to offer, minutes. Defaults to what fits the opening hours. Pass
+   * one value for a fixed duration (a 60-minute session): the length row is
+   * not shown and that duration is used.
+   */
+  lengths?: number[];
   /** Spacing of start times, minutes. */
   stepMinutes?: number;
   /** Days shown as chips. */
@@ -86,6 +92,7 @@ export function BookingRequestPicker({
   value,
   onChange,
   hours = DEFAULT_HOURS,
+  lengths: lengthsProp,
   openWeekdays,
   stepMinutes = 60,
   daysAhead = 14,
@@ -149,7 +156,10 @@ export function BookingRequestPicker({
       />
     );
   } else {
-    const lengths = lengthOptions(hours);
+    const lengths =
+      lengthsProp && lengthsProp.filter((m) => m > 0).length > 0
+        ? lengthsProp.filter((m) => m > 0)
+        : lengthOptions(hours);
     const length = choice.lengthMinutes ?? lengths[0];
     const slots = choice.date
       ? timeSlots({
@@ -191,7 +201,7 @@ export function BookingRequestPicker({
               {words.noTimes}
             </p>
           ))}
-        {choice.date && slots.length > 0 && (
+        {choice.date && slots.length > 0 && lengths.length > 1 && (
           <ChipGroup<number>
             label={words.length}
             value={length}

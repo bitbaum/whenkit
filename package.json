@@ -1,6 +1,6 @@
 {
   "name": "@bitbaum/whenkit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Dates and times people can pick without typing: day chips, time chips, length chips, a readable date field over the native picker, and a low-friction booking request that resolves to {startsAt, endsAt} in the provider's zone.",
   "license": "MIT",
   "author": "Cato",
