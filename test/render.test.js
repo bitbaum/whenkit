@@ -5,7 +5,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createElement as h } from "react";
 import { renderToString } from "react-dom/server";
-import { BookingRequestPicker, DateField, ChipGroup } from "../dist/react/index.js";
+import { BookingRequestPicker, DateField, ChipGroup, DateInput } from "../dist/react/index.js";
 
 const NOW = new Date("2026-10-10T08:00:00Z"); // 10:00 in Zurich, a Saturday
 const base = { zone: "Europe/Zurich", locale: "en-GB", now: NOW, onChange: () => {} };
@@ -107,4 +107,65 @@ test("a fixed duration shows no length choice and is used for the slot", () => {
   assert.match(html, /14:00–15:30/);
   // 17:00 + 90 min would end after 18:00 closing, so it is not offered.
   assert.doesNotMatch(html, />17:00</);
+});
+
+test("DateInput is a drop-in: every input prop reaches the real input, className the visible box", () => {
+  const html = renderToString(
+    h(DateInput, {
+      id: "due",
+      name: "due",
+      required: true,
+      min: "2026-10-01",
+      disabled: true,
+      "aria-invalid": true,
+      className: "ui-input-compact",
+      value: "2026-10-11",
+      onChange: () => {},
+      locale: "en-GB",
+    }),
+  );
+  assert.match(html, /<span class="wk-input ui-input-compact"/);
+  assert.match(html, /<input[^>]*id="due"/);
+  assert.match(html, /<input[^>]*name="due"/);
+  assert.match(html, /<input[^>]*required/);
+  assert.match(html, /<input[^>]*min="2026-10-01"/);
+  assert.match(html, /<input[^>]*disabled/);
+  assert.match(html, /<input[^>]*aria-invalid="true"/);
+  assert.match(html, /<input[^>]*type="date"/);
+  assert.match(html, /Sun, 11 Oct 2026/);
+  assert.match(html, /data-invalid/);
+});
+
+test("DateInput works uncontrolled (a server-action form): defaultValue shows and submits", () => {
+  const html = renderToString(
+    h(DateInput, { name: "date", defaultValue: "2026-03-05", locale: "de" }),
+  );
+  assert.match(html, /Do\., 5\. März 2026|Do, 5\. März 2026/);
+  assert.match(html, /<input[^>]*value="2026-03-05"/);
+  assert.match(html, /<input[^>]*name="date"/);
+});
+
+test("DateInput datetime-local shows the time, and an empty one shows words in the page language", () => {
+  const withTime = renderToString(
+    h(DateInput, {
+      type: "datetime-local",
+      value: "2026-10-11T14:30",
+      onChange: () => {},
+      locale: "en-GB",
+    }),
+  );
+  assert.match(withTime, /Sun, 11 Oct 2026 · 14:30/);
+  const empty = renderToString(h(DateInput, { value: "", onChange: () => {}, locale: "de" }));
+  assert.match(empty, /Datum wählen/);
+  assert.match(empty, /data-empty/);
+  const unknown = renderToString(h(DateInput, { value: "", onChange: () => {}, locale: "xx" }));
+  assert.match(unknown, /Pick a date/);
+});
+
+test("DateInput never throws on a bad value or a bad locale", () => {
+  assert.doesNotThrow(() =>
+    renderToString(
+      h(DateInput, { value: "not-a-date", onChange: () => {}, locale: "zz-INVALID-tag-!!" }),
+    ),
+  );
 });

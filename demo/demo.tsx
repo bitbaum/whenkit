@@ -1,7 +1,7 @@
 // Visual + browser check page. Not shipped.
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { BookingRequestPicker, DateField } from "../src/react/index.js";
+import { BookingRequestPicker, DateField, DateInput } from "../src/react/index.js";
 import { resolveRequest, todayIn, type BookingChoice } from "../src/index.js";
 
 const ZONE = "Europe/Zurich";
@@ -42,4 +42,11 @@ createRoot(document.getElementById("dialog")!).render(
       Send booking request
     </button>
   </>,
+);
+
+createRoot(document.getElementById("own-class")!).render(
+  <DateInput className="app-input" defaultValue="2026-10-11" id="own" />,
+);
+createRoot(document.getElementById("util-class")!).render(
+  <DateInput className="util-input" defaultValue="2026-10-11" id="util" />,
 );

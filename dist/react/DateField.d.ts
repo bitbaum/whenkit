@@ -1,3 +1,4 @@
+import { describeValue } from "./DateInput.js";
 export interface DateFieldProps {
     label: string;
     /** `YYYY-MM-DD` (date) or `YYYY-MM-DDTHH:MM` (withTime), or "" when empty. */
@@ -13,6 +14,7 @@ export interface DateFieldProps {
     hint?: string;
     className?: string;
 }
-export declare function describeFieldValue(value: string, withTime: boolean, locale?: string): string;
+/** Kept for callers of 0.1–0.2: the words for a value, or "" if invalid. */
+export declare const describeFieldValue: typeof describeValue;
 export declare function DateField({ label, value, onChange, withTime, min, max, required, name, placeholder, locale, hint, className, }: DateFieldProps): import("react").JSX.Element;
 //# sourceMappingURL=DateField.d.ts.map
