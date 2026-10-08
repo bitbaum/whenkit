@@ -34,3 +34,12 @@ function Field() {
 createRoot(document.getElementById("hourly")!).render(<Booking unit="hour" id="hourly" />);
 createRoot(document.getElementById("daily")!).render(<Booking unit="day" id="daily" />);
 createRoot(document.getElementById("field")!).render(<Field />);
+createRoot(document.getElementById("dialog")!).render(
+  <>
+    <strong>Book a long studio name that goes on and on</strong>
+    <Booking unit="day" id="dialog" />
+    <button type="button" id="dialog-send">
+      Send booking request
+    </button>
+  </>,
+);

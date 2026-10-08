@@ -115,6 +115,23 @@ try {
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
       `${name}: still no horizontal scroll after picking`,
     );
+    // Nothing may be wider than its column: a grid cell (like a dialog's) must
+    // not be propped open by the day strip.
+    const wider = await page.evaluate(
+      () =>
+        [...document.querySelectorAll(".grid > section, #dialog")].filter(
+          (s) =>
+            s.scrollWidth > s.clientWidth + 1 ||
+            s.getBoundingClientRect().right > window.innerWidth + 1,
+        ).length,
+    );
+    check(wider === 0, `${name}: no column or dialog propped open by the picker (${wider})`);
+    const sendVisible = await page.evaluate(() => {
+      const r = document.getElementById("dialog-send").getBoundingClientRect();
+      return r.right <= window.innerWidth + 1;
+    });
+    check(sendVisible, `${name}: the dialog's button stays on screen`);
+
     check(errors.length === 0, `${name}: no page errors ${errors.join(" | ")}`);
     // Let chip colour transitions finish so the screenshot shows real states.
     await page.waitForTimeout(300);
