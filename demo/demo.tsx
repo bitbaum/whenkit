@@ -47,6 +47,12 @@ createRoot(document.getElementById("dialog")!).render(
 createRoot(document.getElementById("own-class")!).render(
   <DateInput className="app-input" defaultValue="2026-10-11" id="own" />,
 );
+createRoot(document.getElementById("match-date")!).render(
+  <DateInput className="match-input" defaultValue="2026-10-11" id="match" />,
+);
+createRoot(document.getElementById("block-class")!).render(
+  <DateInput className="block-input" defaultValue="2026-10-11" id="blocked" />,
+);
 createRoot(document.getElementById("compact-class")!).render(
   <DateInput className="compact-input" defaultValue="2026-10-11" id="compact" />,
 );
