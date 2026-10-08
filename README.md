@@ -5,7 +5,7 @@ length chips, a readable date field over the native picker, and a booking
 request that resolves to `{ startsAt, endsAt }` in the provider's time zone.
 
 ```bash
-pnpm add github:bitbaum/whenkit#v0.3.0
+pnpm add github:bitbaum/whenkit#v0.3.1
 ```
 
 ```tsx

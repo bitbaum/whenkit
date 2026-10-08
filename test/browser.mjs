@@ -118,6 +118,16 @@ try {
       `${name}: a layered utility beats it too (${own.utilWidth} ${own.utilStyle})`,
     );
 
+    // A dense app input stays dense: the icon scales with the text instead of
+    // forcing a 20px line into a 12px field.
+    const compactHeight = await page.evaluate(
+      () => document.querySelector("#compact-class .wk-input").getBoundingClientRect().height,
+    );
+    check(
+      compactHeight <= 32,
+      `${name}: a 12px compact date input stays compact (${Math.round(compactHeight)}px)`,
+    );
+
     const small = await page.evaluate(
       () =>
         [

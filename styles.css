@@ -281,8 +281,10 @@
 }
 
 .wk-input-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  /* em, not rem: the icon scales with the field's own text, so a dense 12px
+     input is not made taller than its neighbours by a fixed 20px icon. */
+  width: 1.25em;
+  height: 1.25em;
   flex: 0 0 auto;
   opacity: 0.7;
 }
