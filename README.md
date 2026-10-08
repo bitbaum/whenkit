@@ -5,7 +5,7 @@ length chips, a readable date field over the native picker, and a booking
 request that resolves to `{ startsAt, endsAt }` in the provider's time zone.
 
 ```bash
-pnpm add github:bitbaum/whenkit#v0.1.0
+pnpm add github:bitbaum/whenkit#v0.2.0
 ```
 
 ```tsx
@@ -20,6 +20,7 @@ const [choice, setChoice] = useState<BookingChoice | null>(null);
   zone="Europe/Zurich" // the zone of the thing being booked
   hours={{ start: "09:00", end: "18:00" }}
   openWeekdays={[1, 2, 3, 4, 5]}
+  lengths={[60]} // optional: one value = fixed duration, no length row
   value={choice}
   onChange={setChoice}
 />;
