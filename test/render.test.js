@@ -1,0 +1,95 @@
+// The components render on the server (Next RSC/SSR) with the semantics a
+// screen reader needs. A picker that cannot render without a browser breaks
+// every Next page it is put on.
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { createElement as h } from "react";
+import { renderToString } from "react-dom/server";
+import { BookingRequestPicker, DateField, ChipGroup } from "../dist/react/index.js";
+
+const NOW = new Date("2026-10-10T08:00:00Z"); // 10:00 in Zurich, a Saturday
+const base = { zone: "Europe/Zurich", locale: "en-GB", now: NOW, onChange: () => {} };
+
+test("hourly picker: day strip first, no times until a day is chosen", () => {
+  const html = renderToString(h(BookingRequestPicker, { ...base, unit: "hour", value: null }));
+  assert.match(html, /Today/);
+  assert.match(html, /Tomorrow/);
+  assert.doesNotMatch(html, /role="radiogroup" aria-label="Start"/);
+});
+
+test("hourly picker with a day: start times are a radio group and none is in the past", () => {
+  const html = renderToString(
+    h(BookingRequestPicker, {
+      ...base,
+      unit: "hour",
+      value: { kind: "slot", date: "2026-10-10", time: null, lengthMinutes: 60 },
+    }),
+  );
+  assert.match(html, /role="radiogroup" aria-label="Start"/);
+  assert.doesNotMatch(html, />09:00</); // already past at 10:00
+  assert.match(html, />11:00</);
+});
+
+test("a complete request shows the one summary line", () => {
+  const html = renderToString(
+    h(BookingRequestPicker, {
+      ...base,
+      unit: "hour",
+      value: { kind: "slot", date: "2026-10-11", time: "14:00", lengthMinutes: 120 },
+    }),
+  );
+  assert.match(html, /class="wk-summary" aria-live="polite">Sun 11 Oct, 14:00–16:00/);
+});
+
+test("daily picker never asks for a time", () => {
+  const html = renderToString(
+    h(BookingRequestPicker, {
+      ...base,
+      unit: "day",
+      value: { kind: "days", from: "2026-10-11", to: "2026-10-13" },
+    }),
+  );
+  assert.doesNotMatch(html, /aria-label="Start"/);
+  assert.match(html, /\(3 days\)/);
+});
+
+test("closed weekdays cannot be picked", () => {
+  // Open Mon–Fri only: Saturday 10 and Sunday 11 are disabled.
+  const html = renderToString(
+    h(BookingRequestPicker, { ...base, unit: "day", value: null, openWeekdays: [1, 2, 3, 4, 5] }),
+  );
+  assert.match(html, /aria-label="Today, Saturday 10 October"[^>]*disabled/);
+});
+
+test("flexible is offered and can carry no day at all", () => {
+  const html = renderToString(
+    h(BookingRequestPicker, { ...base, unit: "hour", value: { kind: "flexible", date: null } }),
+  );
+  assert.match(html, /role="radio" aria-checked="true"[^>]*>I&#x27;m flexible</);
+  assert.match(html, /Flexible — the provider suggests a time/);
+});
+
+test("DateField shows words, keeps the native control labelled underneath", () => {
+  const html = renderToString(
+    h(DateField, { label: "Deadline", value: "2026-10-11", onChange: () => {}, locale: "en-GB" }),
+  );
+  assert.match(html, /Sun, 11 Oct 2026/);
+  assert.match(html, /<label class="wk-label" for="[^"]+">Deadline<\/label>/);
+  assert.match(html, /type="date"/);
+});
+
+test("ChipGroup is a radiogroup with one tab stop", () => {
+  const html = renderToString(
+    h(ChipGroup, {
+      label: "Length",
+      value: 60,
+      onChange: () => {},
+      options: [
+        { value: 60, label: "1 hr" },
+        { value: 120, label: "2 hrs" },
+      ],
+    }),
+  );
+  assert.equal((html.match(/tabindex="0"/g) ?? []).length, 1);
+  assert.match(html, /role="radio" aria-checked="true"/);
+});

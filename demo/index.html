@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>whenkit demo</title>
+    <link rel="stylesheet" href="../node_modules/@bitbaum/design-tokens/tokens.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <style>
+      /* Page chrome only — the picker's look comes from styles.css + tokens. */
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+      }
+      .theme {
+        padding: 24px 16px;
+        background: hsl(var(--surface-page, 0 0% 98%));
+        color: hsl(var(--text-primary, 0 0% 10%));
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+      .grid {
+        display: grid;
+        gap: 32px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .grid > section {
+        min-width: 0;
+      }
+      h2 {
+        font-size: 14px;
+        margin: 0 0 12px;
+        opacity: 0.6;
+        font-weight: 500;
+      }
+      .resolved {
+        font-size: 11px;
+        opacity: 0.5;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="theme">
+      <div class="grid">
+        <section>
+          <h2>Hourly — a session</h2>
+          <div id="hourly"></div>
+        </section>
+        <section>
+          <h2>Daily — a studio by the day</h2>
+          <div id="daily"></div>
+        </section>
+        <section>
+          <h2>A plain date field</h2>
+          <div id="field"></div>
+        </section>
+      </div>
+    </main>
+    <script src="./dist/demo.js"></script>
+  </body>
+</html>
