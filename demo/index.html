@@ -26,14 +26,26 @@
         max-width: 1200px;
         margin: 0 auto;
       }
-      .grid > section {
-        min-width: 0;
-      }
       h2 {
         font-size: 14px;
         margin: 0 0 12px;
         opacity: 0.6;
         font-weight: 500;
+      }
+      /* Shaped like a modal dialog (shadcn/Radix DialogContent): a grid whose
+         column is sized by its content. A picker that props this open
+         pushes the dialog's buttons off-screen. */
+      .dialog-like {
+        display: grid;
+        gap: 16px;
+        width: calc(100% - 32px);
+        max-width: 28rem;
+        margin: 32px auto 0;
+        padding: 24px;
+        border: 1px solid hsl(var(--border-default, 0 0% 82%));
+        border-radius: 12px;
+        background: hsl(var(--surface-base, 0 0% 100%));
+        box-sizing: border-box;
       }
       .resolved {
         font-size: 11px;
@@ -59,6 +71,7 @@
           <div id="field"></div>
         </section>
       </div>
+      <div class="dialog-like" id="dialog"></div>
     </main>
     <script src="./dist/demo.js"></script>
   </body>
